@@ -8,13 +8,13 @@ def downloadEra5PressureLevels(year, month, day, hour, latNorth, latSouth, lonWe
         'reanalysis-era5-pressure-levels',
         {
             'product_type': 'reanalysis',
-            'format': 'grib',
+            'format': 'netcdf',
             'variable': [
                 'geopotential', 'specific_humidity', 'temperature',
                 'u_component_of_wind', 'v_component_of_wind',
             ],
             'pressure_level': [
-                '850', '1000',
+                '200', '500', '850', '1000',
             ],
             'year': str(year),
             'month': str(month),
@@ -25,7 +25,7 @@ def downloadEra5PressureLevels(year, month, day, hour, latNorth, latSouth, lonWe
                 int(lonEast),
             ],
         },
-        f"{pSalida}era-5-pressure-levels-{year}-{month}-{day}-{hour}.grib")
+        f"{pSalida}era-5-pressure-levels-{year}-{month}-{day}-{hour}.nc")
     
 def downloadEra5SingleLevel(year, month, day, hour, latNorth, latSouth, lonWest, lonEast, pSalida):
 
@@ -37,7 +37,7 @@ def downloadEra5SingleLevel(year, month, day, hour, latNorth, latSouth, lonWest,
         'reanalysis-era5-single-levels',
         {
             'product_type': 'reanalysis',
-            'format': 'grib',
+            'format': 'netcdf',
             'variable': 'total_column_water_vapour',
             'year': year,
             'month': month,
@@ -48,7 +48,7 @@ def downloadEra5SingleLevel(year, month, day, hour, latNorth, latSouth, lonWest,
                 int(lonEast),
             ],
         },
-        f"{pSalida}era-5-single-level-{year}-{month}-{day}-{hour}.grib")
+        f"{pSalida}era-5-single-level-{year}-{month}-{day}-{hour}.nc")
 
 
 
