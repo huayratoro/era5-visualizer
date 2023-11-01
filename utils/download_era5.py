@@ -26,7 +26,7 @@ def downloadEra5PressureLevels(year, month, day, hour, latNorth, latSouth, lonWe
             ],
         },
         f"{pSalida}era-5-pressure-levels-{year}-{month}-{day}-{hour}.nc")
-    
+
 def downloadEra5SingleLevel(year, month, day, hour, latNorth, latSouth, lonWest, lonEast, pSalida):
 
     import cdsapi
@@ -38,7 +38,7 @@ def downloadEra5SingleLevel(year, month, day, hour, latNorth, latSouth, lonWest,
         {
             'product_type': 'reanalysis',
             'format': 'netcdf',
-            'variable': 'total_column_water_vapour',
+            'variable': ["total_column_water_vapour", "vertical_integral_of_eastward_water_vapour_flux", "vertical_integral_of_northward_water_vapour_flux"],
             'year': year,
             'month': month,
             'day': day,
@@ -50,6 +50,30 @@ def downloadEra5SingleLevel(year, month, day, hour, latNorth, latSouth, lonWest,
         },
         f"{pSalida}era-5-single-level-{year}-{month}-{day}-{hour}.nc")
 
+def downloadListDates(pListaFechas, latNorth, latSouth, lonWest, lonEast, pSalida):
+    
+    import pandas as pd
+    import numpy as np
+    
+    # Preparo las fechas
+    fechasEventos = pd.read_csv(pListaFechas)
+    fechasEventos.fechasADescargar = pd.to_datetime(fechasEventos.fechasADescargar)
+
+    for fecha in fechasEventos.fechasADescargar:
+        downloadEra5PressureLevels(
+            fecha.year,
+            "%02d"%fecha.month,
+            "%02d"%fecha.day,
+            "%02d"%fecha.hour,
+            latNorth, latSouth, lonWest, lonEast, pSalida + "pressure-levels/"
+        )
+        downloadEra5SingleLevel(
+            fecha.year,
+            "%02d"%fecha.month,
+            "%02d"%fecha.day,
+            "%02d"%fecha.hour,
+            latNorth, latSouth, lonWest, lonEast, pSalida + "single-level/"
+        )
 
 
 

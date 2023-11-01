@@ -44,12 +44,12 @@ def graficadorTitae850Viento(year, month, day, hour, pSalida):
     ax.add_feature(countries,linewidth=0.4)
 
     ## TPE
-    cm = titaeEra5(850, data['t'].sel(isobaricInhPa=850), data['q'].sel(isobaricInhPa=850)).plot(ax = ax, transform=transform, vmin = 270, vmax = 360, cmap = cmapTitae, add_colorbar = False)
+    cm = titaeEra5(850, data['t'].sel(level=850), data['q'].sel(level=850)).plot(ax = ax, transform=transform, vmin = 270, vmax = 360, cmap = cmapTitae, add_colorbar = False)
     cb = plt.colorbar(cm, ax = ax, shrink = 0.75, extend = "both")
     cb.set_label("[Kelvin]")
 
     ## Viento
-    ax.barbs(data["longitude"].values, data["latitude"].values, data['u'].sel(isobaricInhPa=850).values*1.94, data['v'].sel(isobaricInhPa=850).values*1.94, length=4.5, sizes=dict(emptybarb=0, spacing=0.1, height=0.5), linewidth=0.75, transform=transform, regrid_shape=25, alpha=0.5)
+    ax.barbs(data["longitude"].values, data["latitude"].values, data['u'].sel(level=850).values[0, :, :]*1.94, data['v'].sel(level=850).values[0, :, :]*1.94, length=4.5, sizes=dict(emptybarb=0, spacing=0.1, height=0.5), linewidth=0.75, transform=transform, regrid_shape=25, alpha=0.5)
 
     ## Para los ticks latitudinales y longitudinales
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
