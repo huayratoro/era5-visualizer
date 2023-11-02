@@ -17,9 +17,10 @@ countries = cfeature.NaturalEarthFeature(
         scale='10m',
         facecolor='none',edgecolor='gray')
 
+#----------------------------------------
 def graficadorTitae850Viento(year, month, day, hour, pSalida):
 
-    data = xr.open_dataset(f"db/era-5-pressure-level/era-5-pressure-levels-{year}-{month}-{day}-{hour}.nc")
+    data = xr.open_dataset(f"db/era-5-pressure-levels/era-5-pressure-levels-{year}-{month}-{day}-{hour}.nc")
 
     ## calculo de titae
     def titaeEra5(level, temp, q):
@@ -35,10 +36,10 @@ def graficadorTitae850Viento(year, month, day, hour, pSalida):
     )
 
     # parametros graficos
-    transf = transform=ccrs.PlateCarree()
+    transform=ccrs.PlateCarree()
     fig=plt.figure(figsize=(10,10))
-    ax = plt.subplot(1, 1, 1, projection=transf)
-    ax.set_extent([-90, -30, -50, 10], crs=transf)
+    ax = plt.subplot(1, 1, 1, projection=transform)
+    ax.set_extent([-90, -30, -50, 10], crs=transform)
 
     # Agregamos los límites de los países
     ax.add_feature(countries,linewidth=0.4)
@@ -64,10 +65,10 @@ def graficadorTitae850Viento(year, month, day, hour, pSalida):
 
     plt.savefig(f"{pSalida}{year}-{month}-{day}-{hour}-titae-850-viento.png", dpi = 500, bbox_inches = 'tight')
     plt.close("all")
-
+#----------------------------------------
 def graficador500(year, month, day, hour, pSalida):
 
-    data = xr.open_dataset(f"db/era-5-pressure-level/era-5-pressure-levels-{year}-{month}-{day}-{hour}.nc")
+    data = xr.open_dataset(f"db/era-5-pressure-levels/era-5-pressure-levels-{year}-{month}-{day}-{hour}.nc")
 
     # parametros graficos
     transf = transform=ccrs.PlateCarree()
@@ -105,7 +106,7 @@ def graficador500(year, month, day, hour, pSalida):
 
     plt.savefig(f"{pSalida}{year}-{month}-{day}-{hour}-500-hgt.png", dpi = 500, bbox_inches = 'tight')
     plt.close("all")
-
+#----------------------------------------
 def graficadorPwHgt1000(year, month, day, hour, pSalida):
 
     data = xr.open_dataset(f"db/era-5-single-level/era-5-single-level-{year}-{month}-{day}-{hour}.nc")
@@ -119,7 +120,7 @@ def graficadorPwHgt1000(year, month, day, hour, pSalida):
     )
 
     # parametros graficos
-    transf = transform=ccrs.PlateCarree()
+    transf = ccrs.PlateCarree()
     fig=plt.figure(figsize=(10,10))
     ax = plt.subplot(1, 1, 1, projection=transf)
     ax.set_extent([-90, -30, -50, 10], crs=transf)
@@ -127,10 +128,22 @@ def graficadorPwHgt1000(year, month, day, hour, pSalida):
     # Agregamos los límites de los países
     ax.add_feature(countries,linewidth=0.4)
 
-    ## TPE
-    cm = data['tcwv'].plot(ax = ax, transform=transform, vmin = 0, vmax = 60, cmap = cmapPw, add_colorbar = False)
+    ## PW
+    cm = data['tcwv'].plot(ax = ax, transform=transf, vmin = 0, vmax = 60, cmap = cmapPw, add_colorbar = False)
     cb = plt.colorbar(cm, ax = ax, shrink = 0.75)
     cb.set_label("[mm]")
+    
+    ## En contornos la PW mas alta
+    pw = gaussian_filter(data['tcwv'].values[0, :, :], sigma = 3)
+    ax.contour(data['longitude'].values, data['latitude'].values, pw, np.arange(40, 70, 10), colors = ['magenta'], linewidths = 0.5, transform = transf)
+    
+    ## Vector IVT
+    ax.quiver(
+        data["longitude"].values, 
+        data["latitude"].values, 
+        data['p71.162'].values[0, :, :], 
+        data['p72.162'].values[0, :, :], 
+        transform=transf, regrid_shape=30, alpha=0.5)
 
     ## Para los ticks latitudinales y longitudinales
     gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
@@ -141,8 +154,59 @@ def graficadorPwHgt1000(year, month, day, hour, pSalida):
     gl.yformatter = LATITUDE_FORMATTER
 
     ## Titulo
-    ax.set_title(f"{year}-{month}-{day} {hour}:00 Z \n Precipitable Water [shaded]")
+    ax.set_title(f"{year}-{month}-{day} {hour}:00 Z \n Precipitable Water [shaded] & IVT [vectors, kg m-1 s-1]")
 
     plt.savefig(f"{pSalida}{year}-{month}-{day}-{hour}-pw.png", dpi = 500, bbox_inches = 'tight')
     plt.close("all")
+#----------------------------------------
+def graficadorIvtHgt1000(year, month, day, hour, pSalida):
 
+    sfc = xr.open_dataset(f"db/era-5-pressure-levels/era-5-pressure-levels-{year}-{month}-{day}-{hour}.nc")
+    ivt = xr.open_dataset(f"db/era-5-single-level/era-5-single-level-{year}-{month}-{day}-{hour}.nc")
+    
+    cmapIvt = mpl.colors.ListedColormap(
+        [
+            "#ffffff", "#fedb01", "#fda602", "#ed7a05", "#a12424", "#660d08", "#941ddb"
+        ]
+    )
+
+    # parametros graficos
+    transform=ccrs.PlateCarree()
+    fig=plt.figure(figsize=(10,10))
+    ax = plt.subplot(1, 1, 1, projection=transform)
+    ax.set_extent([-90, -30, -50, 10], crs=transform)
+
+    # Agregamos los límites de los países
+    ax.add_feature(countries,linewidth=0.4)
+
+    # IVT sombreado
+    ivtMag = np.sqrt( ivt['p71.162'].values[0, :, :]**2 + ivt['p72.162'].values[0, :, :]**2 )
+    cm = ax.pcolormesh(ivt['longitude'].values, ivt['latitude'].values, ivtMag, vmin = 0, vmax = 1050, cmap = cmapIvt)
+    cb = plt.colorbar(cm, ax = ax, shrink = 0.75, ticks=np.arange(0, 1050+150, 150), extend = 'max')
+    cb.set_label("[kg m-1 s-1]")
+    # Vector IVT
+    ax.quiver(
+        ivt["longitude"].values, 
+        ivt["latitude"].values, 
+        ivt['p71.162'].values[0, :, :], 
+        ivt['p72.162'].values[0, :, :], 
+        transform=transform, regrid_shape=30, alpha=0.5)
+    # hgt 1000 mb
+    clevs_1000_hght = np.arange(-10, 32, 2)
+    damHgt1000 = gaussian_filter(sfc['z'].sel(level=1000).values[0, :, :] / 98.0665, sigma=2.5)
+    cs = ax.contour(sfc['longitude'].values, sfc['latitude'].values, damHgt1000, clevs_1000_hght, colors='black', transform=transform, linewidths = 0.5)
+    plt.clabel(cs, fmt='%d')
+
+    ## Para los ticks latitudinales y longitudinales
+    gl = ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                    linewidth=0.75, color='gray', alpha=0.75, linestyle='dotted')
+    gl.top_labels = False
+    gl.right_labels = False
+    gl.xformatter = LONGITUDE_FORMATTER
+    gl.yformatter = LATITUDE_FORMATTER
+
+    ## Titulo
+    ax.set_title(f"{year}-{month}-{day} {hour}:00 Z \n IVT [shaded], IVT [vectors] & HGT 1000 mb [contours, dam]")
+
+    plt.savefig(f"{pSalida}{year}-{month}-{day}-{hour}-ivt-1000.png", dpi = 500, bbox_inches = 'tight')
+    plt.close("all")

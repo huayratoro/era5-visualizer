@@ -42,3 +42,12 @@ if (argv[0] == "--graf-pw"):
     else:
         graficadorPwHgt1000(argv[1], argv[2], argv[3], argv[4], argv[5])
 #----------------------------------------
+if (argv[0] == "--graf-hgt-1000-ivt"):
+    if argv[1] == "-l":
+        fechasEventos = pd.read_csv(argv[2])
+        fechasEventos.fechasADescargar = pd.to_datetime(fechasEventos.fechasADescargar)
+        for fecha in fechasEventos.fechasADescargar:
+            graficadorIvtHgt1000(fecha.year, "%02d"%fecha.month, "%02d"%fecha.day, "%02d"%fecha.hour, argv[3])
+    else:
+        graficadorIvtHgt1000(argv[1], argv[2], argv[3], argv[4], argv[5])
+#----------------------------------------

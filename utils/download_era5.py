@@ -65,14 +65,14 @@ def downloadListDates(pListaFechas, latNorth, latSouth, lonWest, lonEast, pSalid
             "%02d"%fecha.month,
             "%02d"%fecha.day,
             "%02d"%fecha.hour,
-            latNorth, latSouth, lonWest, lonEast, pSalida + "pressure-levels/"
+            latNorth, latSouth, lonWest, lonEast, pSalida + "era-5-pressure-levels/"
         )
         downloadEra5SingleLevel(
             fecha.year,
             "%02d"%fecha.month,
             "%02d"%fecha.day,
             "%02d"%fecha.hour,
-            latNorth, latSouth, lonWest, lonEast, pSalida + "single-level/"
+            latNorth, latSouth, lonWest, lonEast, pSalida + "era-5-single-level/"
         )
 
 
