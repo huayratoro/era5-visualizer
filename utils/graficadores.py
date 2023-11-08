@@ -214,8 +214,8 @@ def graficadorTresCampos(year, month, day, hour, lonC, latC, pSalida):
     # Mapa 500 mb
     clevs_500_hght = np.arange(400, 603, 3)
     damHgt500 = gaussian_filter(pressureLevels['z'].sel(level=500).values[0, :, :] / 98.0665, sigma=1.5)
-    cs = ax1.contour(pressureLevels['longitude'].values, pressureLevels['latitude'].values, damHgt500, clevs_500_hght, colors='black', transform=transf, linewidths = 0.5)
-    plt.clabel(cs, fmt='%d', fontsize = 4)
+    cs = ax1.contour(pressureLevels['longitude'].values, pressureLevels['latitude'].values, damHgt500, clevs_500_hght, colors='black', transform=transf, linewidths = 0.25)
+    plt.clabel(cs, fmt='%d', fontsize = 3.5)
     # Velocidad de viento en 500mb
     uwnd_500 = gaussian_filter(pressureLevels['u'].sel(level=500).values[0, :, :], sigma=2.0) * units('m/s')
     vwnd_500 = gaussian_filter(pressureLevels['v'].sel(level=500).values[0, :, :], sigma=2.0) * units('m/s')
@@ -237,7 +237,7 @@ def graficadorTresCampos(year, month, day, hour, lonC, latC, pSalida):
     gl.yformatter = LATITUDE_FORMATTER
 
     ## Titulo
-    ax1.set_title("Geopot. Height 500 mb [dam, contour] \n wind speed [shaded]")
+    ax1.set_title("[A] Geopot. Height 500 mb [dam, contour] \n wind speed [shaded]")
 
     ##---------- 850 mb ----------##
 
@@ -272,7 +272,7 @@ def graficadorTresCampos(year, month, day, hour, lonC, latC, pSalida):
     gl.xformatter = LONGITUDE_FORMATTER
 
     ## Titulo
-    ax2.set_title("Titae [shaded] 850 mb \n winds [knots]")
+    ax2.set_title("[B] Titae [shaded] 850 mb \n winds [knots]")
 
     ##---------- 1000 mb ----------##
 
@@ -301,6 +301,12 @@ def graficadorTresCampos(year, month, day, hour, lonC, latC, pSalida):
     # localizacion del centroide
     ax3.scatter(lonC, latC, s = markerSize, marker = markerRpf, color = markerColor, linewidths=markerWidths, facecolors = markerFaceColor, transform = transf)
 
+    # hgt 1000 mb
+    clevs_1000_hght = np.arange(-10, 32, 2)
+    damHgt1000 = gaussian_filter(pressureLevels['z'].sel(level=1000).values[0, :, :] / 98.0665, sigma=2.5)
+    cs = ax3.contour(pressureLevels['longitude'].values, pressureLevels['latitude'].values, damHgt1000, clevs_1000_hght, colors='black', transform=transform, linewidths = 0.2)
+    plt.clabel(cs, fmt='%d', fontsize = 3)
+
     ## Para los ticks latitudinales y longitudinales
     gl = ax3.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
                     linewidth=0.75, color='gray', alpha=0.75, linestyle='dotted')
@@ -310,7 +316,7 @@ def graficadorTresCampos(year, month, day, hour, lonC, latC, pSalida):
     gl.xformatter = LONGITUDE_FORMATTER
 
     ## Titulo
-    ax3.set_title("Precipitable Water [shaded] \n IVT [vectors, kg m-1 s-1]")
+    ax3.set_title("[C] Precip. W. [shaded] & IVT [vectors, kg m-1 s-1] \n Geopot. Height 1000 mb [dam, contour]")
 
     ####
     plt.subplots_adjust(wspace=0.075)
