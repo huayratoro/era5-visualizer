@@ -51,3 +51,6 @@ if (argv[0] == "--graf-hgt-1000-ivt"):
     else:
         graficadorIvtHgt1000(argv[1], argv[2], argv[3], argv[4], argv[5])
 #----------------------------------------
+if (argv[0] == "--graf-500-850-1000"):
+    graficadorTresCampos(argv[1], argv[2], argv[3], argv[4], float(argv[5]), float(argv[6]), argv[7])
+#----------------------------------------
